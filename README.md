@@ -1,13 +1,8 @@
-# Mini Order Processing System
+# PythonProjectAITH
 
 Учебный backend-проект с демонстрацией микросервисной архитектуры:
 
 **API → Message Broker → Consumer → Database**
-
-Проект полностью запускается локально через **Docker Compose** и покрыт тестами
-с общим покрытием **не менее 90%**.
-
----
 
 ## Архитектура
 
@@ -34,38 +29,70 @@
 4. Consumer получает сообщение
 5. Consumer обновляет заказ (`status = PROCESSED`)
 
----
 
-## Структура проекта
-├── docker-compose.yml
-├── README.md
-├── server
-│ ├── Dockerfile
-│ ├── app
-│ │ ├── api
-│ │ ├── db
-│ │ ├── services
-│ │ ├── metrics.py
-│ │ ├── settings.py
-│ │ └── main.py
-│ └── tests
-│ └── test_*.py
-├── consumer
-│ ├── Dockerfile
-│ └── app
-│ ├── db.py
-│ ├── worker.py
-│ ├── settings.py
-│ └── main.py
-└── monitoring
-├── prometheus.yml
-└── grafana
+## 📁 Структура проекта
+
+```text
+pythonback-aith/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                 # CI: запуск тестов и проверка покрытия
+│
+├── server/                        # HTTP API (FastAPI)
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── __init__.py
+│   │   │   └── orders.py          # Роуты для работы с заказами
+│   │   │
+│   │   ├── db/
+│   │   │   ├── __init__.py
+│   │   │   ├── models.py          # SQLAlchemy модели
+│   │   │   └── session.py         # Создание DB-сессий
+│   │   │
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   └── publisher.py       # Публикация событий в RabbitMQ
+│   │   │
+│   │   ├── __init__.py
+│   │   ├── main.py                # Точка входа FastAPI
+│   │   ├── metrics.py             # Prometheus-метрики
+│   │   └── settings.py            # Конфигурация сервиса
+│   │
+│   ├── tests/                     # Тесты сервера
+│   │   ├── conftest.py
+│   │   ├── test_health_and_metrics.py
+│   │   ├── test_orders.py
+│   │   ├── test_orders_happy_path.py
+│   │   ├── test_orders_publish_failed.py
+│   │   └── test_orders_validation.py
+│   │
+│   ├── Dockerfile                 # Docker-образ API
+│   └── pyproject.toml             # Зависимости сервера
+│
+├── consumer/                      # Consumer (RabbitMQ worker)
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── db.py                  # Работа с БД
+│   │   ├── main.py                # Точка входа consumer
+│   │   ├── settings.py            # Конфигурация
+│   │   └── worker.py              # Обработка сообщений из RabbitMQ
+│   │
+│   ├── tests/
+│   │   └── test_worker.py         # Тесты consumer
+│   │
+│   ├── Dockerfile                 # Docker-образ consumer
+│   └── pyproject.toml             # Зависимости consumer
+│
+├── monitoring/
+│   ├── prometheus.yml             # Конфигурация Prometheus
+│   └── grafana/                   # (опционально) provisioning Grafana
+│
+├── docker-compose.yml             # Запуск всей системы одной командой
+├── .gitignore                     # Игнорируемые файлы
+└── README.md                      # Документация проекта
+
 
 ## Запуск проекта
-
-### Требования
-- Docker
-- Docker Compose
 
 ### Запуск
 
@@ -114,4 +141,10 @@ POST http://localhost:8000/orders
 ### Получение заказа
 ```
 GET http://localhost:8000/orders/{id}
+```
+
+### Grafana
+
+```
+http://localhost:3000
 ```
