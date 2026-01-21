@@ -25,18 +25,16 @@ jobs:
         run: |
           docker compose build api consumer
 
-      - name: Run consumer tests with coverage (>= 90%)
+      - name: Run server tests with coverage (>= 90%)
         run: |
-          docker compose run --rm --no-deps consumer sh -lc "\
-            pip install -q pytest pytest-cov && \
-            pytest --cov=app.worker --cov-report=term-missing --cov-fail-under=90 \
-          "
+          docker compose run --rm --no-deps api \
+            pytest --cov=app --cov-report=term-missing --cov-fail-under=90
 
       - name: Run consumer tests with coverage (>= 90%)
         run: |
           docker compose run --rm --no-deps consumer sh -lc "\
             pip install -q pytest pytest-cov && \
-            pytest --cov=app --cov-report=term-missing --cov-fail-under=90 \
+            pytest --cov=app.worker --cov-report=term-missing --cov-fail-under=90 \
           "
 
       - name: Cleanup
